@@ -4,7 +4,8 @@
 #   https://<your-ngrok-host>/slack/events
 display_information:
   name: opentag-dev-bot
-  description: OpenTag (dev)
+  description: (dev) Mention the bot, and the coding agent on your own machine does the work.
+  background_color: "#590088"
 features:
   bot_user:
     display_name: opentag-dev-bot

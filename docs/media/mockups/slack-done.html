@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="slack.css">
+<title>OpenTag — the turn lands, the thread stays a conversation</title>
+</head>
+<body>
+<div class="window" id="shot">
+  <div class="chrome">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">Acme Corp — #eng-payments</span>
+  </div>
+  <div class="body">
+    <div class="side">
+      <div class="team">Acme Corp</div>
+      <div class="group">Channels</div>
+      <div class="ch"><span class="hash">#</span>general</div>
+      <div class="ch active"><span class="hash">#</span>eng-payments</div>
+      <div class="ch"><span class="hash">#</span>eng-platform</div>
+      <div class="ch"><span class="hash">#</span>incidents</div>
+      <div class="group">Apps</div>
+      <div class="ch app">opentag</div>
+    </div>
+
+    <div class="main">
+      <div class="head">
+        <span class="name"># eng-payments</span>
+        <span class="meta">12 members · the bot is in this channel</span>
+      </div>
+      <div class="thread-label">Thread</div>
+
+      <div class="msg hl">
+        <div class="av anna">AP</div>
+        <div class="content">
+          <div class="who">Anna Petrova<span class="ts">10:14</span></div>
+          <div class="text">
+            <p><span class="mention">@opentag</span> staging checkout has been 500-ing on refunds
+            since the 09:40 deploy. Dig into <code>api/payments/refund.ts</code> and tell me what broke.</p>
+          </div>
+          <div class="reacts"><div class="react plain">✅ 1</div></div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av bot">OT</div>
+        <div class="content">
+          <div class="who">OpenTag<span class="tag">APP</span><span class="ts">10:14</span></div>
+          <div class="text">
+            <p>Fixed on branch <code>fix/refund-charge-id</code>. <code>refundIntent()</code> was still
+            passing <code>payment_intent</code> after deploy #1847 bumped Stripe to v18, which wants a
+            charge id — Stripe answered <code>parameter_unknown</code>, we re-threw, the route returned 500.</p>
+            <p>It now maps the intent to its charge at the boundary, the way this team fixed the v17 bump
+            in <span class="mention">#eng-platform</span> back in March. Suite is green —
+            <code>28 passed</code>, including the regression test I added
+            (<code>refund.test.ts:104</code>). Nothing else in the repo refunds by intent id.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av bot">OT</div>
+        <div class="content">
+          <div class="who">OpenTag<span class="tag">APP</span><span class="ts">10:15</span></div>
+          <div class="text">
+            <p>✅ Approved by <span class="mention">@Anna Petrova</span><br>
+            <b>Run <code>npm test -- refund</code> in ~/OpenTag/acme/eng-payments</b></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av anna">AP</div>
+        <div class="content">
+          <div class="who">Anna Petrova<span class="ts">10:18</span></div>
+          <div class="text"><p>open a PR against main, add Marco as reviewer</p></div>
+          <div class="reacts"><div class="react plain">👀 1</div></div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av bot">OT</div>
+        <div class="content">
+          <div class="who">OpenTag<span class="tag">APP</span><span class="ts">10:18</span></div>
+          <div class="text">
+            <p>Pushing the branch and opening it against <code>main</code>.</p>
+          </div>
+          <div class="status-line">🛠️ gh pr create --base main --reviewer marco-k</div>
+        </div>
+      </div>
+
+      <div class="composer">Reply in thread…</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
