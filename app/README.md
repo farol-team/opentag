@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# OpenTag SaaS (`app/`) — control plane
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The dashboard and the system of record: workspaces, members, runners, channels,
+Slack installations (bot tokens), issued runner tokens, and the activity log of
+every turn. The data plane in [`cloud/`](../cloud/README.md) keeps nothing
+durable — it asks this service, over tRPC with an `x-internal-secret` header.
 
-Currently, two official plugins are available:
+React 19 + Vite on the front, Hono + tRPC on the back, PostgreSQL via Drizzle,
+sign-in through Slack (OIDC).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Running it
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env      # DATABASE_URL, Slack app credentials, INTERNAL_API_SECRET
+npm install
+npm run dev               # Vite + Hono on :3000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Command | What it does |
+|---|---|
+| `npm run check` | `tsc -b` — type check (this and `lint` are the pre-submit pair) |
+| `npm run lint` | eslint |
+| `npm run format` | prettier |
+| `npm test` | vitest (`api/**/*.test.ts` / `*.spec.ts`) |
+| `npm run build` | vite build + esbuild `api/boot.ts` → `dist/boot.js` |
+| `npm start` | production server from `dist/` |
+| `npm run db:generate` / `db:migrate` / `db:push` | drizzle-kit (needs `DATABASE_URL`) |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Deploying is [`docs/deploy.md`](../docs/deploy.md).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Layout
+
 ```
+api/                 server
+├── boot.ts          Hono entry
+├── router.ts        root tRPC router: auth, workspace, runner, memory, billing, slack
+├── saas-router.ts   domain logic
+├── middleware.ts    publicQuery / authedQuery
+├── slack-oauth.ts   "Add to Slack" (OAuth v2) + the scopes the manifest must match
+├── runner-connect.ts browser handoff: a runner asks, a human approves here
+├── identity/        Slack OIDC sign-in, sessions
+├── queries/         DB access
+└── lib/             env, cookies, vite integration
+contracts/           types shared with the frontend
+db/                  schema.ts, relations.ts, migrations/
+src/                 frontend: pages/, components/ui (shadcn), hooks/, providers/
+```
+
+Path aliases: `@/* → src/*`, `@contracts/* → contracts/*`, `@db/* → db/*`.
+
+Conventions and the wider architecture live in [`AGENTS.md`](../AGENTS.md).

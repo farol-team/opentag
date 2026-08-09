@@ -12,12 +12,36 @@
 # grants scopes at install time, so each workspace must reinstall.
 display_information:
   name: OpenTag
-  description: Slack ↔ your local AI agents, with team memory
+  description: Mention the bot, and the coding agent on your own machine does the work.
   background_color: "#590088"
   long_description: >-
-    Memory for Slack. Bring your own agents. Mention the bot in any thread —
-    a coding agent on your own machine picks up the task, remembers everything
-    your team ever said, and streams the answer back.
+    OpenTag turns a Slack mention into work on a real machine — yours.
+
+
+    Mention the bot in any thread and the task goes to the coding agent already
+    running on your laptop: Claude Code, Codex, OpenCode, Cursor, whichever one
+    you use. The answer streams back into the thread as it is written, with the
+    step it is on underneath, and Approve / Deny / Stop buttons whenever the
+    agent wants to do something it should not do unasked. Reply in the thread
+    like you would to a colleague and the same session picks up where it left
+    off — no new mention, no re-explaining.
+
+
+    Your code never leaves your machine. The runner is a thin tray app that
+    dials out to us: no open ports, no repository upload, no keys of yours on
+    our servers. It works only inside folders you have opened to it, and every
+    destructive step is a button in the thread rather than a surprise in your
+    git history.
+
+
+    The bot also remembers. Every channel it is invited to becomes part of your
+    team's memory, and an agent answering in a channel may read exactly that
+    channel's memory — the boundary Slack already draws — so a public answer
+    never quotes a room you are not in.
+
+
+    Bring your own agent, keep your own machine, and let the thread be the
+    interface.
 features:
   bot_user:
     display_name: opentag
